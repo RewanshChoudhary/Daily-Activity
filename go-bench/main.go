@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"flag"
-	"os"
 	
+	"os"
 )
 
 type inputFile struct {
@@ -14,6 +14,9 @@ type inputFile struct {
 }
 
 func main() {
+	fileData,errors:=getFileData()
+	// fmt.Println(fileData,errors)
+	
 
 }
 func getFileData() (inputFile, error) {
@@ -41,7 +44,7 @@ func getFileData() (inputFile, error) {
 
 
    //if neither of the above things weren't caught then we send the input data 
-   
+
 	return inputFile{filepath,*separator,*pretty},nil
 
 
