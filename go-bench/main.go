@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"flag"
-	
+	"fmt"
+	"path/filepath"
+
 	"os"
 )
 
@@ -47,6 +49,23 @@ func getFileData() (inputFile, error) {
 
 	return inputFile{filepath,*separator,*pretty},nil
 
+
+
+
+}
+
+func checkValidFile( filename string ) (bool,error){
+       fileExt:=filepath.Ext(filename)
+	   if (fileExt!=".csv"){
+		return false,fmt.Errorf("The extension was not csv instead it was : %v",fileExt)
+
+
+	   }
+          
+	   if _,err:=os.Stat(filename);err!=nil && os.IsNotExist(err){
+		return false,fmt.Errorf("The given file does not exist %v",filename)
+	   }
+	   return true ,nil
 
 
 

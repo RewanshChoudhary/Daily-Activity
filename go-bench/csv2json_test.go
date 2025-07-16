@@ -2,7 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	
+
 	"os"
+
 	"reflect"
 	"testing"
 )
@@ -57,6 +61,55 @@ func Test_getFileType(t *testing.T){
 	
 
 
+	
+
+}
+
+func Test_checkValidFile(t *testing.T){
+	wantFile,err:=os.CreateTemp("","test.csv")
+	if err!=nil{
+		panic(err)
+		
+	}
+
+	defer os.Remove(wantFile.Name())
+
+	 tests:=[] struct {
+		name string 
+		fileName string
+		want bool
+		wantErr bool
+	}{
+		{"File does not exist","test.csv",false,true},
+		{"File does exist ","test.csv",true,false},
+		{"File type is wrong ","test.csv",false,true},
+	}
+
+
+
+
+	for _,tt:=range tests{
+		t.Run(tt.name,func (t *testing.T){
+			got,err:=checkValidFile(tt.fileName)
+
+			if(err!=nil) !=tt.wantErr{
+				fmt.Errorf("The error we got %v the error we want %v",err,tt.wantErr)
+
+
+			}
+			if(tt.want !=got) {
+				fmt.Errorf("The response we get from checkValidFile %v : The response we want %v")
+
+			}
+
+		})
+
+	}
+
+
+
+
+   
 	
 
 }
