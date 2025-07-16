@@ -14,7 +14,7 @@ type inputFile struct {
 }
 
 func main() {
-	fileData,errors:=getFileData()
+	
 	// fmt.Println(fileData,errors)
 	
 
@@ -37,7 +37,7 @@ func getFileData() (inputFile, error) {
 	filepath:=flag.Arg(0)
 
 
-	if (*separator!="comma" || *separator!="semicolon"){
+	if (*separator!="comma" && *separator!="semicolon"){
 		return inputFile{},errors.New("The separator value was not valid")
 	}
   
