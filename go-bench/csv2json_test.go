@@ -44,7 +44,7 @@ func Test_getFileData(t *testing.T) {
 }
 
 func Test_checkValidFile(t *testing.T) {
-	validFile, err := os.CreateTemp("", "test.csv")
+	validFile, err := os.CreateTemp("", "*.csv")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"path/filepath"
+	"strings"
 
 	"os"
 )
@@ -101,6 +103,8 @@ func processCSVFile(fileData inputFile ,writerChannel chan <- map[string]string)
 
 		if (err1==io.EOF){
 			close(writerChannel)
+			break
+
 
 			
 		}else if err1!=nil {
@@ -152,4 +156,66 @@ func check(er error ){
 		exitGracefully(er)
 
 	}
+}
+
+func writeJsonFile(filePath string ,writerChannel <- chan map[string]string ,done chan <- bool,pretty bool){
+	writerString :=getStringerWriter(filePath)
+
+
+	
+}
+
+func getStringerWriter(csvPath string) func (string,bool) {
+	jsonDir:=filepath.Dir(csvPath)
+	jsonName:=fmt.Sprintf("%s.json",strings.TrimSuffix(filepath.Base(csvPath),".csv"))
+	finalLocation:=filepath.Join(jsonDir,jsonName)
+
+	f,err:=os.Create(finalLocation)
+	check(err)
+
+	return func (data string ,close bool) {
+		_,err =f.WriteString(data)
+		
+
+		if (close){
+			f.Close()
+		}
+
+
+	}
+
+
+
+
+}
+
+func getJson(pretty bool ) (func (map[string ]string  )string ,string ){
+
+	var jsonFunc func(map[string]string) string
+	var breakPoint string
+
+	if (pretty){
+		breakPoint="\n"
+
+		jsonFunc=func(record map[string ]string )string {
+			jsonData,_:=json.MarshalIndent(record,"  ","  ")
+			return "   "+string(jsonData)
+
+
+
+		}
+
+	}else {
+		breakPoint=""
+
+		jsonFunc=func (record map[string ]string )string {
+			jsonData,_:=json.Marshal(record)
+
+			return string(jsonData)
+		}
+
+
+
+	}
+	return jsonFunc,breakPoint
 }
