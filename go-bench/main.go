@@ -1,6 +1,7 @@
 package main
 
 import (
+	
 	"encoding/csv"
 	"encoding/json"
 	"errors"
@@ -160,8 +161,37 @@ func check(er error ){
 
 func writeJsonFile(filePath string ,writerChannel <- chan map[string]string ,done chan <- bool,pretty bool){
 	writerString :=getStringerWriter(filePath)
+	jsonFunc,breakLine:=getJson(pretty)
+
+	fmt.Print("Writing the json file")
+	writerString("["+breakLine,false)
+
+	first:=true
+	for {
+		record,more:=<-writerChannel
+
+		if more{
+			if !first{
+				writerString("["+breakLine,false)
+
+			}else {
+				first=false
+
+			}
+			jsonData:=jsonFunc(record)
+			writerString(jsonData,false)
+
+		}else {
+			writerString("]"+breakLine,true)
+			fmt.Print("Completed .....")
+			done <-true
+
+			break;
+
+		}
 
 
+	}
 	
 }
 
