@@ -98,7 +98,7 @@ func Test_checkValidFile(t *testing.T){
 
 			}
 			if(tt.want !=got) {
-				fmt.Errorf("The response we get from checkValidFile %v : The response we want %v")
+				fmt.Errorf("The response we get from checkValidFile %v : The response we want %v",got,tt.want)
 
 			}
 

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/csv"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"path/filepath"
 
 	"os"
@@ -69,4 +71,85 @@ func checkValidFile( filename string ) (bool,error){
 
 
 
+}
+
+
+func processCSVFile(fileData inputFile ,writerChannel chan <- map[string]string){
+	data,errors:=os.Open(fileData.filepath)
+
+	if (errors!=nil){
+		fmt.Errorf("Unexpected error 42069: %v",errors)
+
+	}
+	
+	
+
+	var headers [] string
+
+	reader := csv.NewReader(data)
+	if (fileData.separator=="semicolon"){
+		reader.Comma=';'
+
+	}
+	
+	headers,err:=reader.Read()
+	check(err)
+
+	for {
+		line,err1:=reader.Read()
+
+
+		if (err1==io.EOF){
+			close(writerChannel)
+
+			
+		}else if err1!=nil {
+		 exitGracefully(err1)
+
+		}
+
+		record,err:=processLine(headers,line)
+
+		if err!=nil {
+			fmt.Printf("Line :%sError: :%s line",line ,err)
+
+		}
+
+		writerChannel<-record
+
+
+
+	}
+  
+}
+
+func processLine(headers []string, dataLine []string) (map[string]string, error) {
+ if (len(headers)!=len(dataLine)){
+        return nil,errors.New("The number of headers and provided line does not match")
+
+
+ }
+recordMap:=make(map[string]string)
+
+ for i,value :=range headers {
+	recordMap[value]=dataLine[i]
+
+ }
+
+ return recordMap,nil
+
+
+	
+
+}
+
+func exitGracefully(err1 error) {
+	panic("Unexpected Error")
+}
+
+func check(er error ){
+	if (er!=nil){
+		exitGracefully(er)
+
+	}
 }
