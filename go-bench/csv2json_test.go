@@ -2,7 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -119,5 +122,70 @@ func Test_processCSVFile(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+
+func Test_getJson (t *testing.T){
+	dataMap := []map[string]string{
+		{"COL1": "1", "COL2": "2", "COL3": "3"},
+		{"COL1": "4", "COL2": "5", "COL3": "6"},
+	}
+	// Defining our test cases
+	tests := []struct {
+		csvPath  string // The "fake" csv path.
+		jsonPath string // The existing JSON file with the expected data
+		pretty   bool // Whether the output is formatted or not
+		name     string // The name of the test
+	}{
+		{"compact.csv", "compact.json", false, "Compact JSON"}, 
+		{"pretty.csv", "pretty.json", true, "Pretty JSON"},
+	}
+
+	for _,tt:= range tests {
+		t.Run (tt.name,func(t *testing.T){
+            writerChannel:=make (chan map[string ]string )
+			done :=make (chan bool)
+
+			go func (){
+				for _,record:=range dataMap{
+					writerChannel<-record
+				}
+				close(writerChannel)
+
+			}()
+			//Sending the data in csvPath to json path 
+			go writeJsonFile(tt.csvPath,writerChannel,done,tt.pretty)
+
+				<-done
+
+
+			testOutput,err:=os.ReadFile(tt.jsonPath)
+
+			if (err!=nil){
+				fmt.Errorf("The error we get the from the writeJsonPath():= %v",err)
+
+			}
+			defer os.Remove(tt.jsonPath)
+
+			wantOutput,err:=os.ReadFile(filepath.Join("testJsonFiles",tt.jsonPath))
+
+
+
+			if (string (testOutput)!=string(wantOutput)){
+				fmt.Errorf("writeJson():= threw us %v but we want %v",testOutput,wantOutput)
+
+			}
+
+
+
+
+
+
+
+			
+
+		})
+
 	}
 }
